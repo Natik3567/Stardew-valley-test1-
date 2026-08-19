@@ -113,3 +113,10 @@ body {
 .wiki-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
 .wiki-table th, .wiki-table td { border: 1px solid var(--border-color); padding: 10px; text-align: left; }
 .wiki-table th { background-color: #f1f8e9; }
+.menu-icon {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    margin-right: 8px;
+    border-radius: 4px;
+}
