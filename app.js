@@ -1,52 +1,137 @@
-// Tes données (J'ai mis quelques exemples avec des images du wiki officiel)
-const stardewData = [
-    { name: "Abigail", category: "NPC", info: "Loves: Amethyst", img: "https://stardewvalleywiki.com/mediawiki/images/8/88/Abigail.png" },
-    { name: "Sebastian", category: "NPC", info: "Loves: Frozen Tear", img: "https://stardewvalleywiki.com/mediawiki/images/a/a8/Sebastian.png" },
-    { name: "Catfish", category: "Fish", info: "Spring/Fall (River)", img: "https://stardewvalleywiki.com/mediawiki/images/9/99/Catfish.png" },
-    { name: "Strawberry", category: "Crop", info: "Spring (8 Days)", img: "https://stardewvalleywiki.com/mediawiki/images/6/6d/Strawberry.png" },
-    { name: "Iridium Sprinkler", category: "Crafting", info: "Farming Lvl 9", img: "https://stardewvalleywiki.com/mediawiki/images/9/90/Iridium_Sprinkler.png" },
-    // Imagine qu'il y a 200 autres objets ici...
-];
+const database = {
+    "NPCs": [
+        { 
+            name: "Abigail", 
+            info: "Loves Amethyst & Pumpkin", 
+            details: "Birthday: Fall 13. Lives at Pierre's General Store. Loves mine exploration and playing drums.",
+            images: [
+                "https://stardewvalleywiki.com/mediawiki/images/8/88/Abigail.png",
+                "https://stardewvalleywiki.com/mediawiki/images/a/a8/Sebastian.png"
+            ]
+        },
+        { 
+            name: "Sebastian", 
+            info: "Loves Frozen Tear & Sashimi", 
+            details: "Birthday: Winter 10. Lives in the Mountain basement. Works as a programmer.",
+            images: [
+                "https://stardewvalleywiki.com/mediawiki/images/a/a8/Sebastian.png",
+                "https://stardewvalleywiki.com/mediawiki/images/8/88/Abigail.png"
+            ]
+        }
+    ],
+    "Farming": [
+        { 
+            name: "Strawberry", 
+            info: "Spring Crop (8 days)", 
+            details: "Regrows every 4 days. Seeds bought during Egg Festival.",
+            images: ["https://stardewvalleywiki.com/mediawiki/images/6/6d/Strawberry.png"]
+        },
+        { 
+            name: "Pumpkin", 
+            info: "Fall Crop (13 days)", 
+            details: "Can grow into a Giant Crop when planted in a 3x3 grid.",
+            images: ["https://stardewvalleywiki.com/mediawiki/images/6/64/Pumpkin.png"]
+        }
+    ],
+    "Fish": [
+        { 
+            name: "Catfish", 
+            info: "Spring/Fall (Rainy)", 
+            details: "Location: River. Time: 6am - 12am. Difficulty: 75.",
+            images: ["https://stardewvalleywiki.com/mediawiki/images/9/99/Catfish.png"]
+        }
+    ]
+};
 
-const grid = document.getElementById('item-grid');
-const trigger = document.getElementById('scroll-trigger');
+const contentArea = document.getElementById('content-area');
+const breadcrumb = document.getElementById('breadcrumb');
+const modalOverlay = document.getElementById('modal-overlay');
+const modalClose = document.getElementById('modal-close');
 
-let currentIndex = 0;
-const itemsPerLoad = 3; // Nombre d'items à charger à chaque fois qu'on scrolle
+let currentCategory = null;
+let imageRotationTimer = null;
 
-// Fonction pour générer les cartes HTML
-function loadItems() {
-    const end = Math.min(currentIndex + itemsPerLoad, stardewData.length);
-    
-    for (let i = currentIndex; i < end; i++) {
-        const item = stardewData[i];
+// Display main categories
+function showCategories() {
+    clearInterval(imageRotationTimer);
+    currentCategory = null;
+    breadcrumb.textContent = "Categories";
+    contentArea.innerHTML = "";
+
+    Object.keys(database).forEach(cat => {
         const card = document.createElement('div');
         card.className = 'card';
-        
-        // L'attribut loading="lazy" est LA solution magique pour les images
         card.innerHTML = `
-            <img src="${item.img}" alt="${item.name}" loading="lazy">
+            <h3>${cat}</h3>
+            <span class="tag">${database[cat].length} Items</span>
+        `;
+        card.onclick = () => showSubcategory(cat);
+        contentArea.appendChild(card);
+    });
+}
+
+// Display items inside a category
+function showSubcategory(categoryName) {
+    clearInterval(imageRotationTimer);
+    currentCategory = categoryName;
+    breadcrumb.textContent = `Categories / ${categoryName}`;
+    contentArea.innerHTML = "";
+
+    const items = database[categoryName];
+
+    items.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.id = `card-item-${index}`;
+
+        const initialImg = item.images[0];
+        
+        card.innerHTML = `
+            <img id="img-${index}" src="${initialImg}" alt="${item.name}">
             <h3>${item.name}</h3>
-            <span class="tag">${item.category}</span>
+            <span class="tag">${categoryName}</span>
             <p>${item.info}</p>
         `;
-        grid.appendChild(card);
-    }
-    
-    currentIndex = end;
-    
-    // Si tout est chargé, on cache le texte de chargement
-    if (currentIndex >= stardewData.length) {
-        trigger.style.display = 'none';
+
+        card.onclick = () => openModal(item, categoryName);
+        contentArea.appendChild(card);
+    });
+
+    // 10-second image slideshow for NPCs
+    if (categoryName === "NPCs") {
+        let imageIndex = 0;
+        imageRotationTimer = setInterval(() => {
+            imageIndex = (imageIndex + 1) % 2;
+            items.forEach((item, idx) => {
+                const imgElement = document.getElementById(`img-${idx}`);
+                if (imgElement && item.images[imageIndex]) {
+                    imgElement.src = item.images[imageIndex];
+                }
+            });
+        }, 10000);
     }
 }
 
-// Le fameux Intersection Observer (ne charge le code que quand on voit le bas de la page)
-const observer = new IntersectionObserver((entries) => {
-    if (entries[0].isIntersecting) {
-        loadItems();
-    }
-});
+// Open modal view for details
+function openModal(item, category) {
+    document.getElementById('modal-title').textContent = item.name;
+    document.getElementById('modal-category').textContent = `${category} / Details`;
+    document.getElementById('modal-body').textContent = item.details;
+    document.getElementById('modal-img').src = item.images[0];
+    
+    breadcrumb.textContent = `Categories / ${category} / ${item.name}`;
+    modalOverlay.classList.remove('hidden');
+}
 
-// On commence par observer le bas de la page
-observer.observe(trigger);
+// Close modal
+modalClose.onclick = () => {
+    modalOverlay.classList.add('hidden');
+    if (currentCategory) {
+        breadcrumb.textContent = `Categories / ${currentCategory}`;
+    }
+};
+
+breadcrumb.onclick = showCategories;
+
+// Initialize
+showCategories();

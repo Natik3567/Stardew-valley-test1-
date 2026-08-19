@@ -3,20 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stardew Valley App</title>
+    <title>SDV Info</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>Stardew Valley Tracker</h1>
-        <p>Your ultimate guide to Pelican Town</p>
+        <h1>SDV Info</h1>
+        <div id="breadcrumb" class="breadcrumb">Categories</div>
     </header>
 
-    <!-- La grille où les items vont apparaître -->
-    <main id="item-grid" class="grid-container"></main>
+    <main id="content-area" class="grid-container"></main>
 
-    <!-- Le détecteur pour charger la suite (Lazy Loading) -->
-    <div id="scroll-trigger">Scroll down to load more...</div>
+    <!-- Fenêtre d'information (Modal) -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button id="modal-close">&times;</button>
+            <img id="modal-img" src="" alt="">
+            <h2 id="modal-title"></h2>
+            <span id="modal-category" class="tag"></span>
+            <p id="modal-body"></p>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>
