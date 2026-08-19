@@ -1,9 +1,11 @@
 :root {
     --bg-color: #f4e9d8;
     --sidebar-bg: #4caf50;
+    --sidebar-hover: #388e3c;
     --text-dark: #3e2723;
     --card-bg: #ffffff;
     --border-color: #ddd;
+    --transition-speed: 0.3s;
 }
 
 body {
@@ -11,151 +13,111 @@ body {
     margin: 0; padding: 0;
     background-color: var(--bg-color);
     color: var(--text-dark);
-    display: flex;
-    height: 100vh;
+    display: flex; height: 100vh; overflow: hidden;
 }
 
-.app-container {
-    display: flex;
-    width: 100%;
-}
+/* --- Layout Principal --- */
+.app-container { display: flex; width: 100%; height: 100%; }
 
-/* Sidebar Wiki */
+/* --- Sidebar Rétractable --- */
 .sidebar {
-    width: 250px;
-    background-color: var(--sidebar-bg);
-    color: white;
-    padding: 20px 0;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    width: 250px; background-color: var(--sidebar-bg); color: white;
+    transition: width var(--transition-speed); display: flex; flex-direction: column;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1); z-index: 10;
 }
+.sidebar.collapsed { width: 70px; }
 
-.sidebar h2 {
-    text-align: center;
-    margin-bottom: 30px;
-    border-bottom: 2px solid rgba(255,255,255,0.2);
-    padding-bottom: 10px;
+.sidebar-header {
+    display: flex; align-items: center; padding: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
 }
-
-.sidebar ul {
-    list-style: none;
-    padding: 0; margin: 0;
+.icon-btn {
+    background: none; border: none; color: white; font-size: 24px;
+    cursor: pointer; padding: 0; margin-right: 15px;
 }
+.sidebar.collapsed .sidebar-title { display: none; }
 
+.sidebar ul { list-style: none; padding: 0; margin: 20px 0 0 0; }
 .sidebar li {
-    padding: 15px 25px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.3s;
+    padding: 15px 20px; cursor: pointer; display: flex; align-items: center;
+    transition: background var(--transition-speed); font-weight: bold; white-space: nowrap;
+}
+.sidebar li:hover, .sidebar li.active { background-color: var(--sidebar-hover); }
+.sidebar li .icon { font-size: 20px; width: 30px; text-align: center; }
+.sidebar.collapsed li .text { display: none; }
+
+/* --- Main Content & Top Bar --- */
+.main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+.top-bar {
+    background: white; padding: 15px 30px; display: flex;
+    justify-content: space-between; align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 5;
 }
 
-.sidebar li:hover, .sidebar li.active {
-    background-color: rgba(0,0,0,0.15);
+.search-container {
+    display: flex; align-items: center; background: var(--bg-color);
+    padding: 8px 15px; border-radius: 20px; width: 300px;
+}
+.search-container input {
+    border: none; background: transparent; outline: none;
+    margin-left: 10px; width: 100%; font-size: 16px; color: var(--text-dark);
+}
+.lang-btn {
+    background: var(--sidebar-bg); color: white; border: none;
+    padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold;
 }
 
-/* Main Content */
-.main-content {
-    flex: 1;
-    padding: 30px;
-    overflow-y: auto;
-}
+#content-area { padding: 30px; overflow-y: auto; flex: 1; }
 
-h1 { margin-top: 0; }
+/* --- Composants (Cartes, Filtres, Vedette) --- */
+.filters-bar { margin-bottom: 20px; display: flex; gap: 15px; }
+.filters-bar select { padding: 8px; border-radius: 5px; border: 1px solid var(--border-color); }
 
-/* Cadre PNJ Vedette */
-.featured-card {
-    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
-    border: 2px solid #ff9800;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 0 4px 8px rgba(255, 152, 0, 0.2);
-}
-
-.featured-card.hidden { display: none; }
-.featured-label { font-size: 12px; color: #e65100; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
-.featured-content { display: flex; align-items: center; gap: 20px; }
-.featured-content img { width: 80px; height: 80px; object-fit: contain; }
-.featured-content h3 { margin: 0; font-size: 24px; color: #d84315; }
-
-/* Grid */
 .grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;
 }
 
 .card {
-    background: var(--card-bg);
-    border-radius: 10px;
-    padding: 20px;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    background: var(--card-bg); border-radius: 10px; padding: 20px;
+    text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    cursor: pointer; transition: transform 0.2s;
 }
+.card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.15); }
+.card img { max-width: 64px; height: 64px; object-fit: contain; margin-bottom: 10px; }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+.featured-card {
+    background: linear-gradient(135deg, #fff3e0, #ffe0b2); border: 2px solid #ff9800;
+    border-radius: 12px; padding: 20px; margin-bottom: 30px; cursor: pointer;
 }
+.featured-label { font-size: 12px; color: #e65100; font-weight: bold; margin-bottom: 10px; }
+.featured-content { display: flex; align-items: center; gap: 20px; }
+.featured-content img { width: 80px; height: 80px; }
 
-.card img {
-    max-width: 64px; height: 64px;
-    object-fit: contain; margin-bottom: 10px;
-}
+/* --- Page d'accueil --- */
+.home-hero { text-align: center; margin-bottom: 40px; }
+.home-hero h1 { font-size: 2.5em; color: var(--sidebar-hover); }
 
-/* Modal (Fenêtre Wiki détaillée) */
+/* --- Modal (Fiche Wiki) --- */
 .modal-overlay {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.7);
-    display: flex; justify-content: center; align-items: center;
-    z-index: 1000;
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7);
+    display: flex; justify-content: center; align-items: center; z-index: 1000;
 }
 .modal-overlay.hidden { display: none; }
-
 .modal-wrapper {
-    background: white;
-    width: 90%; max-width: 700px; max-height: 85vh;
-    border-radius: 12px;
-    display: flex; flex-direction: column;
-    position: relative;
-    overflow: hidden;
+    background: white; width: 90%; max-width: 700px; max-height: 85vh;
+    border-radius: 12px; display: flex; flex-direction: column; position: relative;
 }
+.close-btn { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 30px; cursor: pointer; color: white; }
+.modal-header { background: var(--sidebar-bg); color: white; padding: 20px; display: flex; align-items: center; gap: 20px; border-radius: 12px 12px 0 0; }
+.modal-header img { width: 80px; height: 80px; background: white; border-radius: 10px; padding: 5px; }
+.modal-body { padding: 20px; overflow-y: auto; font-size: 15px; }
 
-.close-btn {
-    position: absolute; top: 15px; right: 20px;
-    background: none; border: none; font-size: 30px; cursor: pointer; color: white;
-}
-
-.modal-header {
-    background: #4caf50; color: white;
-    padding: 20px; display: flex; align-items: center; gap: 20px;
-}
-.modal-header img { width: 80px; height: 80px; background: white; border-radius: 50%; padding: 5px; }
-.modal-header h2 { margin: 0; font-size: 28px; }
-
-.modal-body {
-    padding: 20px;
-    overflow-y: auto;
-    font-size: 15px;
-}
-
-/* Tableaux pour les prix et crafts */
-.wiki-table {
-    width: 100%; border-collapse: collapse; margin: 15px 0;
-}
-.wiki-table th, .wiki-table td {
-    border: 1px solid var(--border-color); padding: 10px; text-align: left;
-}
+/* Tableaux Wiki */
+.wiki-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+.wiki-table th, .wiki-table td { border: 1px solid var(--border-color); padding: 10px; text-align: left; }
 .wiki-table th { background-color: #f1f8e9; }
-
-/* Listes de cadeaux */
-.gift-section { margin-bottom: 15px; }
-.gift-title { font-weight: bold; margin-bottom: 5px; }
-.gift-loves { color: #d32f2f; }
-.gift-likes { color: #388e3c; }
-.gift-hates { color: #000; }
+.quality-normal { color: #555; }
+.quality-silver { color: #7f8c8d; font-weight: bold; }
+.quality-gold { color: #f1c40f; font-weight: bold; }
+.quality-iridium { color: #9b59b6; font-weight: bold; }

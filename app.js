@@ -1,249 +1,230 @@
-// === BASE DE DONNÉES DU WIKI ===
-const wikiData = {
-    "NPCs": [
-        {
-            name: "Abigail",
-            img: "https://stardewvalleywiki.com/mediawiki/images/8/88/Abigail.png",
-            locations: "Magasin de Pierre, Cimetière, Mines",
-            schedule: "Varie selon la saison. Souvent près du pont ou joue de la flûte à la montagne.",
-            birthday: "Automne 13",
-            profession: "Étudiante / Aventurière",
-            hearts: 14,
-            gifts: {
-                loves: ["Améthyste", "Citrouille", "Repas épicé", "Gâteau au chocolat", "Éclat prismatique"],
-                likes: ["Quartz", "Tulipe", "Pois de senteur", "Maïonèse"],
-                neutral: ["Lait", "Œuf", "Tous les fruits (sauf exceptions)"],
-                hates: ["Argile", "Pierre", "Minerai de cuivre", "Sucre"]
-            },
-            notes: "Elle adore les jeux vidéo et explorer les mines. Si vous l'épousez, elle vous aidera parfois à combattre."
-        },
-        {
-            name: "Sebastian",
-            img: "https://stardewvalleywiki.com/mediawiki/images/a/a8/Sebastian.png",
-            locations: "Sous-sol de la scierie (Robin), Lac de la montagne",
-            schedule: "Reste souvent dans sa chambre jusqu'à 15h. Fume parfois près du lac le soir.",
-            birthday: "Hiver 10",
-            profession: "Programmeur freelance",
-            hearts: 14,
-            gifts: {
-                loves: ["Larme gelée", "Sashimi", "Obsidienne", "Œuf de vide", "Soupe à la citrouille"],
-                likes: ["Quartz", "Flétan", "Café"],
-                neutral: ["Poisson (la plupart)"],
-                hates: ["Argile", "Omelette", "Bière", "Confiture"]
-            },
-            notes: "Joue à un jeu de rôle sur table avec Sam. Préfère la pluie et l'obscurité."
-        }
-    ],
-    "Agriculture": [
-        {
-            name: "Fraise (Strawberry)",
-            img: "https://stardewvalleywiki.com/mediawiki/images/6/6d/Strawberry.png",
-            season: "Printemps",
-            seedPrice: "100g (Festival des Œufs uniquement)",
-            growthTime: "8 Jours",
-            regrowth: "Tous les 4 Jours",
-            xp: "18 XP par récolte",
-            prices: { normal: 120, silver: 150, gold: 180, iridium: 240 },
-            uses: ["Confiture de fraise (Fût/Pot)", "Recette : Salade de fruits"],
-            notes: "L'une des cultures les plus rentables du printemps si plantée le 13 du mois ou avant en serre."
-        },
-        {
-            name: "Carambole (Starfruit)",
-            img: "https://stardewvalleywiki.com/mediawiki/images/d/db/Starfruit.png",
-            season: "Été",
-            seedPrice: "400g (Au magasin de l'Oasis)",
-            growthTime: "13 Jours",
-            regrowth: "Ne repousse pas",
-            xp: "43 XP par récolte",
-            prices: { normal: 750, silver: 937, gold: 1125, iridium: 1500 },
-            uses: ["Vin de carambole (extrêmement rentable)", "Cabane des Junimos"],
-            notes: "C'est la culture d'été offrant le plus grand profit brut du jeu."
-        }
-    ],
-    "Poissons": [
-        {
-            name: "Poisson-globe (Pufferfish)",
-            img: "https://stardewvalleywiki.com/mediawiki/images/b/ba/Pufferfish.png",
-            season: "Été",
-            location: "Océan",
-            time: "12h00 - 16h00",
-            weather: "Soleil",
-            difficulty: "80 (Comportement Flotteur)",
-            prices: { normal: 200, silver: 250, gold: 300, iridium: 400 },
-            uses: ["Paquet Poissons Spéciaux (Centre Communautaire)", "Adoré par Abigail"],
-            notes: "Nécessite une bonne canne à pêche. Peut aussi s'acheter au Chariot de Voyage."
-        }
-    ],
-    "Objets": [
-        {
-            name: "Éclat prismatique (Prismatic Shard)",
-            img: "https://stardewvalleywiki.com/mediawiki/images/5/56/Prismatic_Shard.png",
-            category: "Minéral",
-            description: "Un minéral très rare aux couleurs de l'arc-en-ciel.",
-            price: "2000g",
-            howToGet: "Nœuds d'iridium, Pierres mystiques, Géodes omni, Pêche (très rare).",
-            uses: "Obtenir l'Épée Galactique au désert, donner au Musée, offrir (Adoré par presque tout le monde sauf Haley).",
-        }
-    ],
-    "Crafts": [
-        {
-            name: "Arroseur en iridium",
-            img: "https://stardewvalleywiki.com/mediawiki/images/9/90/Iridium_Sprinkler.png",
-            levelReq: "Agriculture Niveau 9",
-            utility: "Arrose 24 cases adjacentes (un carré de 5x5) chaque matin.",
-            materials: [
-                { item: "Lingot d'or", qty: 1 },
-                { item: "Lingot d'iridium", qty: 1 },
-                { item: "Pile", qty: 1 }
-            ]
-        }
-    ]
-};
+// === ETAT DE L'APPLICATION ===
+let currentLang = 'fr';
+let currentView = 'home';
+let currentCategory = null;
+let featuredInterval = null;
 
-// === VARIABLES ET LOGIQUE DE L'INTERFACE ===
-const menuItems = document.querySelectorAll('#menu li');
-const gridContainer = document.getElementById('grid-container');
-const categoryTitle = document.getElementById('category-title');
-const featuredContainer = document.getElementById('featured-container');
-const featuredContent = document.getElementById('featured-content');
-
-// Modal variables
+// === ELEMENTS DOM ===
+const contentArea = document.getElementById('content-area');
+const searchInput = document.getElementById('global-search');
+const langBtn = document.getElementById('lang-toggle');
+const sidebar = document.getElementById('sidebar');
+const toggleSidebarBtn = document.getElementById('toggle-sidebar');
 const modalOverlay = document.getElementById('modal-overlay');
-const modalClose = document.getElementById('modal-close');
-const modalTitle = document.getElementById('modal-title');
-const modalImg = document.getElementById('modal-img');
-const modalBody = document.getElementById('modal-body');
 
-let currentFeaturedInterval = null;
+// === ÉCOUTEURS D'ÉVÉNEMENTS ===
+langBtn.addEventListener('click', toggleLanguage);
+toggleSidebarBtn.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
+searchInput.addEventListener('input', (e) => handleSearch(e.target.value));
+document.getElementById('modal-close').addEventListener('click', closeModal);
 
-// Charger une catégorie
-function loadCategory(category) {
-    // Gérer l'état du menu
-    menuItems.forEach(li => li.classList.remove('active'));
-    event.target.classList.add('active');
+// === FONCTIONS DE BASE ===
+function toggleLanguage() {
+    currentLang = currentLang === 'fr' ? 'en' : 'fr';
+    langBtn.textContent = currentLang === 'fr' ? '🇫🇷 FR' : '🇬🇧 EN';
+    updateUIStrings();
     
-    categoryTitle.textContent = category;
-    gridContainer.innerHTML = '';
-    
-    const items = wikiData[category];
+    // Rafraichir la vue actuelle avec la nouvelle langue
+    if (searchInput.value.trim() !== '') handleSearch(searchInput.value);
+    else if (currentView === 'home') loadView('home');
+    else if (currentView === 'category') loadView('category', currentCategory);
+}
 
-    // Nettoyer l'intervalle du PNJ aléatoire si on change de page
-    clearInterval(currentFeaturedInterval);
-    featuredContainer.classList.add('hidden');
-
-    // REGLE SPÉCIALE : Si on est sur "NPCs", on active le changement automatique toutes les 10s
-    if (category === 'NPCs' && items.length > 0) {
-        featuredContainer.classList.remove('hidden');
-        updateFeaturedNPC(items); // Affiche le premier tout de suite
-        
-        currentFeaturedInterval = setInterval(() => {
-            updateFeaturedNPC(items);
-        }, 10000); // Toutes les 10 secondes
-    }
-
-    // Afficher toutes les cartes dans la grille
-    items.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-            <img src="${item.img}" alt="${item.name}">
-            <h3>${item.name}</h3>
-        `;
-        card.onclick = () => openModal(item, category);
-        gridContainer.appendChild(card);
+function updateUIStrings() {
+    // Met à jour tous les textes du menu et des placeholders
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.textContent = i18n[currentLang][key];
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        el.placeholder = i18n[currentLang][key];
     });
 }
 
-// Mettre à jour le cadre en vedette avec un PNJ aléatoire
-function updateFeaturedNPC(npcList) {
-    const randomNpc = npcList[Math.floor(Math.random() * npcList.length)];
-    featuredContent.innerHTML = `
-        <img src="${randomNpc.img}" alt="${randomNpc.name}">
-        <div>
-            <h3>${randomNpc.name}</h3>
-            <p style="margin: 5px 0;">Anniversaire : ${randomNpc.birthday}</p>
-            <p style="margin: 0; font-size: 13px; color: #555;">Cliquez sur sa carte en bas pour voir ses cadeaux préférés !</p>
-        </div>
-    `;
-    featuredContainer.onclick = () => openModal(randomNpc, 'NPCs');
+function loadView(viewType, categoryName = null) {
+    currentView = viewType;
+    currentCategory = categoryName;
+    clearInterval(featuredInterval); // Arrête le PNJ vedette
+    
+    // Gérer l'état actif du menu
+    document.querySelectorAll('.sidebar li').forEach(li => li.classList.remove('active'));
+    if(viewType === 'home') document.getElementById('nav-home').classList.add('active');
+    if(viewType === 'category') document.getElementById(`nav-${categoryName}`).classList.add('active');
+
+    if (viewType === 'home') renderHome();
+    else if (viewType === 'category') renderCategory(categoryName);
 }
 
-// === GÉNÉRATEUR DE CONTENU WIKI DÉTAILLÉ (MODAL) ===
-function openModal(item, category) {
-    modalTitle.textContent = item.name;
-    modalImg.src = item.img;
-    let html = '';
+// === RENDU DES PAGES ===
+function renderHome() {
+    contentArea.innerHTML = `
+        <div class="home-hero">
+            <h1>${i18n[currentLang].home_title}</h1>
+            <p>${i18n[currentLang].home_desc}</p>
+        </div>
+        <div class="grid-container">
+            ${Object.keys(db).map(cat => `
+                <div class="card" onclick="loadView('category', '${cat}')">
+                    <h3>${i18n[currentLang][`nav_${cat.toLowerCase()}`] || cat}</h3>
+                    <p>${db[cat].length} entries</p>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
 
-    // Génération dynamique selon la catégorie (C'est ici qu'on évite les gros blocs de texte !)
+function renderCategory(category, filterValue = 'all') {
+    let items = db[category];
+    let html = `<h1>${i18n[currentLang][`nav_${category.toLowerCase()}`] || category}</h1>`;
+
+    // Section Vedette UNIQUE pour les PNJ
     if (category === 'NPCs') {
-        html = `
-            <p><strong>Lieux :</strong> ${item.locations}</p>
-            <p><strong>Horaires :</strong> ${item.schedule}</p>
-            <p><strong>Anniversaire :</strong> ${item.birthday}</p>
-            <p><strong>Profession :</strong> ${item.profession}</p>
-            <hr>
-            <h3>Cadeaux</h3>
-            <div class="gift-section"><div class="gift-title gift-loves">💖 Adore :</div> ${item.gifts.loves.join(', ')}</div>
-            <div class="gift-section"><div class="gift-title gift-likes">😊 Apprécie :</div> ${item.gifts.likes.join(', ')}</div>
-            <div class="gift-section"><div class="gift-title">😐 Neutre :</div> ${item.gifts.neutral.join(', ')}</div>
-            <div class="gift-section"><div class="gift-title gift-hates">🤢 Déteste :</div> ${item.gifts.hates.join(', ')}</div>
-            <hr>
-            <p><em>${item.notes}</em></p>
+        html += `<div id="featured-container" class="featured-card">
+                    <div class="featured-label">${i18n[currentLang].featured}</div>
+                    <div id="featured-content" class="featured-content"></div>
+                 </div>`;
+    }
+
+    // Filtres
+    html += `<div class="filters-bar">
+                <select id="main-filter" onchange="renderCategory('${category}', this.value)">
+                    <option value="all">${i18n[currentLang].filter_all}</option>
+                    ${category === 'Farming' ? `
+                        <option value="spring" ${filterValue==='spring'?'selected':''}>${i18n[currentLang].filter_spring}</option>
+                        <option value="summer" ${filterValue==='summer'?'selected':''}>${i18n[currentLang].filter_summer}</option>
+                        <option value="fall" ${filterValue==='fall'?'selected':''}>${i18n[currentLang].filter_fall}</option>
+                    ` : ''}
+                </select>
+             </div>`;
+
+    // Application du filtre
+    if (filterValue !== 'all' && category === 'Farming') {
+        items = items.filter(item => item.season === filterValue);
+    }
+
+    // Grille des éléments
+    html += `<div class="grid-container">
+                ${items.map(item => `
+                    <div class="card" onclick="openModal('${item.id}', '${category}')">
+                        <img src="${item.img}" alt="${item.name[currentLang]}">
+                        <h3>${item.name[currentLang]}</h3>
+                    </div>
+                `).join('')}
+             </div>`;
+
+    contentArea.innerHTML = html;
+
+    // Lancement du PNJ Vedette
+    if (category === 'NPCs' && items.length > 0) {
+        updateFeatured(items);
+        featuredInterval = setInterval(() => updateFeatured(items), 10000);
+    }
+}
+
+function updateFeatured(items) {
+    const item = items[Math.floor(Math.random() * items.length)];
+    const container = document.getElementById('featured-content');
+    if(container) {
+        container.innerHTML = `
+            <img src="${item.img}" alt="${item.name[currentLang]}">
+            <div>
+                <h3 style="margin:0; font-size:24px; color:#d84315;">${item.name[currentLang]}</h3>
+                <p style="margin:5px 0;">📍 ${item.location[currentLang]}</p>
+            </div>
         `;
-    } 
-    else if (category === 'Agriculture' || category === 'Poissons') {
-        html = `
-            <p><strong>Saison :</strong> ${item.season}</p>
-            ${item.seedPrice ? `<p><strong>Graines :</strong> ${item.seedPrice}</p>` : ''}
-            ${item.growthTime ? `<p><strong>Temps de pousse :</strong> ${item.growthTime} (${item.regrowth})</p>` : ''}
-            ${item.location ? `<p><strong>Lieu :</strong> ${item.location} (${item.time} - Météo: ${item.weather})</p>` : ''}
+        document.getElementById('featured-container').onclick = () => openModal(item.id, 'NPCs');
+    }
+}
+
+// === RECHERCHE GLOBALE ===
+function handleSearch(query) {
+    clearInterval(featuredInterval); // Arrête le featured en recherche
+    if (query.trim() === '') {
+        loadView(currentView, currentCategory); // Retour à la vue normale
+        return;
+    }
+
+    query = query.toLowerCase();
+    let results = [];
+
+    // Parcourir toute la base de données
+    for (let cat in db) {
+        db[cat].forEach(item => {
+            // Cherche dans le nom en FR et en EN
+            if (item.name.fr.toLowerCase().includes(query) || item.name.en.toLowerCase().includes(query)) {
+                results.push({ item, cat });
+            }
+        });
+    }
+
+    let html = `<h1>${i18n[currentLang].search_results} "${query}"</h1>`;
+    if (results.length === 0) {
+        html += `<p>${i18n[currentLang].no_results}</p>`;
+    } else {
+        html += `<div class="grid-container">
+                    ${results.map(res => `
+                        <div class="card" onclick="openModal('${res.item.id}', '${res.cat}')">
+                            <img src="${res.item.img}" alt="${res.item.name[currentLang]}">
+                            <h3>${res.item.name[currentLang]}</h3>
+                            <span style="font-size:12px; color:#666;">${i18n[currentLang][`nav_${res.cat.toLowerCase()}`] || res.cat}</span>
+                        </div>
+                    `).join('')}
+                 </div>`;
+    }
+    contentArea.innerHTML = html;
+}
+
+// === FENÊTRES DÉTAILLÉES (MODALS) ===
+function openModal(itemId, category) {
+    const item = db[category].find(i => i.id === itemId);
+    
+    document.getElementById('modal-title').textContent = item.name[currentLang];
+    document.getElementById('modal-img').src = item.img;
+    
+    let bodyHtml = '';
+
+    // Construction HTML différente selon la catégorie pour avoir des fiches parfaites
+    if (category === 'NPCs') {
+        bodyHtml = `
+            <p><strong>🎂 Anniversaire :</strong> ${item.birthday[currentLang]}</p>
+            <p><strong>📍 Lieu :</strong> ${item.location[currentLang]}</p>
+            <h3>🎁 Cadeaux</h3>
+            <p><strong>💖 Adore :</strong> ${item.gifts.loves[currentLang]}</p>
+            <p><strong>😊 Apprécie :</strong> ${item.gifts.likes[currentLang]}</p>
+            <p><strong>🤢 Déteste :</strong> ${item.gifts.hates[currentLang]}</p>
+        `;
+    } else if (category === 'Farming' || category === 'Fish') {
+        bodyHtml = `
+            ${item.growth ? `<p><strong>Temps de pousse :</strong> ${item.growth[currentLang]}</p>` : ''}
+            ${item.location ? `<p><strong>Lieu :</strong> ${item.location[currentLang]}</p>` : ''}
             
             <h3>Prix de vente</h3>
             <table class="wiki-table">
                 <tr><th>Qualité</th><th>Prix</th></tr>
-                <tr><td>Normal</td><td>${item.prices.normal}g</td></tr>
-                <tr><td>Argent ★</td><td>${item.prices.silver}g</td></tr>
-                <tr><td>Or ★</td><td>${item.prices.gold}g</td></tr>
-                <tr><td>Iridium ★</td><td>${item.prices.iridium}g</td></tr>
-            </table>
-
-            <h3>Utilisations & Infos</h3>
-            <ul>
-                ${item.uses.map(u => `<li>${u}</li>`).join('')}
-            </ul>
-            <p><em>${item.notes}</em></p>
-        `;
-    }
-    else if (category === 'Crafts') {
-        html = `
-            <p><strong>Déblocage :</strong> ${item.levelReq}</p>
-            <p><strong>Utilité :</strong> ${item.utility}</p>
-            <h3>Matériaux requis</h3>
-            <table class="wiki-table">
-                <tr><th>Objet</th><th>Quantité</th></tr>
-                ${item.materials.map(m => `<tr><td>${m.item}</td><td>x${m.qty}</td></tr>`).join('')}
+                <tr><td class="quality-normal">Normal</td><td>${item.prices.normal}g</td></tr>
+                <tr><td class="quality-silver">Argent ★</td><td>${item.prices.silver}g</td></tr>
+                <tr><td class="quality-gold">Or ★</td><td>${item.prices.gold}g</td></tr>
+                <tr><td class="quality-iridium">Iridium ★</td><td>${item.prices.iridium}g</td></tr>
             </table>
         `;
-    }
-    else if (category === 'Objets') {
-        html = `
-            <p><strong>Catégorie :</strong> ${item.category}</p>
-            <p><strong>Description :</strong> ${item.description}</p>
-            <p><strong>Prix :</strong> ${item.price}</p>
-            <p><strong>Comment l'obtenir :</strong> ${item.howToGet}</p>
-            <p><strong>Utilisations :</strong> ${item.uses}</p>
+    } else if (category === 'Items' || category === 'Crafting') {
+        bodyHtml = `
+            ${item.desc ? `<p><strong>Description :</strong> ${item.desc[currentLang]}</p>` : ''}
+            ${item.materials ? `<p><strong>Matériaux :</strong> ${item.materials[currentLang]}</p>` : ''}
+            ${item.obtain ? `<p><strong>Obtention :</strong> ${item.obtain[currentLang]}</p>` : ''}
+            ${item.unlock ? `<p><strong>Déblocage :</strong> ${item.unlock[currentLang]}</p>` : ''}
         `;
     }
 
-    modalBody.innerHTML = html;
+    document.getElementById('modal-body').innerHTML = bodyHtml;
     modalOverlay.classList.remove('hidden');
 }
 
-// Fermer le modal
-modalClose.onclick = () => modalOverlay.classList.add('hidden');
-modalOverlay.onclick = (e) => {
-    if (e.target === modalOverlay) modalOverlay.classList.add('hidden');
+function closeModal() {
+    modalOverlay.classList.add('hidden');
 }
 
-// Charger la première catégorie par défaut au lancement
-loadCategory('NPCs');
+// Initialisation au chargement de la page
+updateUIStrings();
+loadView('home');
