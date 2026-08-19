@@ -3,11 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
     <title>Stardew Valley Wiki</title>
+=======
+    <title>Wiki Stardew Valley</title>
+>>>>>>> ee96e1821d6bfc8e6aaf8b6466c8d9929bb4326f
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="app-container">
+<<<<<<< HEAD
         <!-- Sidebar -->
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
@@ -21,11 +26,23 @@
                 <li onclick="loadView('category', 'Fish')" id="nav-Fish"><span class="icon">🐟</span><span class="text" data-i18n="nav_fish">Poissons</span></li>
                 <li onclick="loadView('category', 'Items')" id="nav-Items"><span class="icon">🧱</span><span class="text" data-i18n="nav_items">Objets</span></li>
                 <li onclick="loadView('category', 'Crafting')" id="nav-Crafting"><span class="icon">🔨</span><span class="text" data-i18n="nav_crafts">Crafts & Recettes</span></li>
+=======
+        <!-- Menu latéral -->
+        <nav class="sidebar">
+            <h2>Stardew Wiki</h2>
+            <ul id="menu">
+                <li onclick="loadCategory('NPCs')" class="active">👤 Personnages (PNJ)</li>
+                <li onclick="loadCategory('Agriculture')">🌱 Agriculture</li>
+                <li onclick="loadCategory('Poissons')">🐟 Poissons</li>
+                <li onclick="loadCategory('Objets')">🧱 Objets</li>
+                <li onclick="loadCategory('Crafts')">🔨 Crafts & Recettes</li>
+>>>>>>> ee96e1821d6bfc8e6aaf8b6466c8d9929bb4326f
             </ul>
         </nav>
 
         <!-- Contenu principal -->
         <main class="main-content">
+<<<<<<< HEAD
             <!-- Barre supérieure (Recherche + Langue) -->
             <header class="top-bar">
                 <div class="search-container">
@@ -41,14 +58,38 @@
     </div>
 
     <!-- Fenêtre modale (Fiche détaillée) -->
+=======
+            <h1 id="category-title">Personnages (PNJ)</h1>
+            
+            <!-- Zone pour le PNJ aléatoire (uniquement visible dans la catégorie PNJ) -->
+            <div id="featured-container" class="featured-card hidden">
+                <div class="featured-label">⭐ En vedette (Change toutes les 10s)</div>
+                <div id="featured-content" class="featured-content"></div>
+            </div>
+
+            <!-- Grille des objets -->
+            <div id="grid-container" class="grid-container"></div>
+        </main>
+    </div>
+
+    <!-- Fenêtre de détails (Modal Wiki) -->
+>>>>>>> ee96e1821d6bfc8e6aaf8b6466c8d9929bb4326f
     <div id="modal-overlay" class="modal-overlay hidden">
         <div class="modal-wrapper">
             <button id="modal-close" class="close-btn">&times;</button>
             <div class="modal-header">
                 <img id="modal-img" src="" alt="">
+<<<<<<< HEAD
                 <h2 id="modal-title"></h2>
             </div>
             <div id="modal-body" class="modal-body"></div>
+=======
+                <h2 id="modal-title">Titre</h2>
+            </div>
+            <div id="modal-body" class="modal-body">
+                <!-- Le contenu détaillé (tableaux, listes) sera injecté ici par JavaScript -->
+            </div>
+>>>>>>> ee96e1821d6bfc8e6aaf8b6466c8d9929bb4326f
         </div>
     </div>
 
