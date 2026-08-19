@@ -8,19 +8,46 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Sidebar -->
+        <!-- Sidebar Unique et Rétractable -->
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <button id="toggle-sidebar" class="icon-btn">☰</button>
+                <button id="toggle-sidebar" class="icon-btn" title="Réduire/Ouvrir">☰</button>
                 <h2 class="sidebar-title">SDV Wiki</h2>
             </div>
             <ul id="menu">
-                <li onclick="loadView('home')" id="nav-home" class="active"><span class="icon">🏠</span><span class="text" data-i18n="nav_home">Accueil</span></li>
-                <li onclick="loadView('category', 'NPCs')" id="nav-NPCs"><span class="icon">👤</span><span class="text" data-i18n="nav_npcs">Personnages</span></li>
-                <li onclick="loadView('category', 'Farming')" id="nav-Farming"><span class="icon">🌱</span><span class="text" data-i18n="nav_farming">Agriculture</span></li>
-                <li onclick="loadView('category', 'Fish')" id="nav-Fish"><span class="icon">🐟</span><span class="text" data-i18n="nav_fish">Poissons</span></li>
-                <li onclick="loadView('category', 'Items')" id="nav-Items"><span class="icon">🧱</span><span class="text" data-i18n="nav_items">Objets</span></li>
-                <li onclick="loadView('category', 'Crafting')" id="nav-Crafting"><span class="icon">🔨</span><span class="text" data-i18n="nav_crafts">Crafts & Recettes</span></li>
+                <li onclick="loadView('home')" id="nav-home" class="active">
+                    <span class="icon">🏠</span><span class="text" data-i18n="nav_home">Accueil</span>
+                </li>
+                <li onclick="loadView('category', 'NPCs')" id="nav-NPCs">
+                    <span class="icon">👤</span><span class="text" data-i18n="nav_npcs">Personnages</span>
+                </li>
+                <li onclick="loadView('category', 'Farming')" id="nav-Farming">
+                    <span class="icon">🌱</span><span class="text" data-i18n="nav_farming">Agriculture</span>
+                </li>
+                <li onclick="loadView('category', 'Fish')" id="nav-Fish">
+                    <span class="icon">🐟</span><span class="text" data-i18n="nav_fish">Poissons</span>
+                </li>
+                <li onclick="loadView('category', 'Items')" id="nav-Items">
+                    <span class="icon">🧱</span><span class="text" data-i18n="nav_items">Objets</span>
+                </li>
+                <li onclick="loadView('category', 'Crafting')" id="nav-Crafting">
+                    <span class="icon">🔨</span><span class="text" data-i18n="nav_crafts">Crafts & Recettes</span>
+                </li>
+                <li onclick="loadView('category', 'Cooking')" id="nav-Cooking">
+                    <span class="icon">🍳</span><span class="text" data-i18n="nav_cooking">Cuisine</span>
+                </li>
+                <li onclick="loadView('category', 'Mines')" id="nav-Mines">
+                    <span class="icon">⛏️</span><span class="text" data-i18n="nav_mines">Mines</span>
+                </li>
+                <li onclick="loadView('category', 'Animals')" id="nav-Animals">
+                    <span class="icon">🐔</span><span class="text" data-i18n="nav_animals">Animaux</span>
+                </li>
+                <li onclick="loadView('category', 'Monsters')" id="nav-Monsters">
+                    <span class="icon">⚔️</span><span class="text" data-i18n="nav_monsters">Monstres</span>
+                </li>
+                <li onclick="loadView('category', 'Festivals')" id="nav-Festivals">
+                    <span class="icon">🎉</span><span class="text" data-i18n="nav_festivals">Festivals</span>
+                </li>
             </ul>
         </nav>
 
@@ -52,7 +79,6 @@
         </div>
     </div>
 
-    <!-- Il est crucial de charger data.js AVANT app.js -->
     <script src="data.js"></script>
     <script src="app.js"></script>
 </body>

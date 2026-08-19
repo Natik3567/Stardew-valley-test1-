@@ -1,39 +1,38 @@
-// Dictionnaire pour l'interface utilisateur
 const i18n = {
     fr: {
         nav_home: "Accueil", nav_npcs: "Personnages", nav_farming: "Agriculture",
         nav_fish: "Poissons", nav_items: "Objets", nav_crafts: "Crafts & Recettes",
-        search_placeholder: "Rechercher (ex: Abigail, Panais...)",
+        nav_cooking: "Cuisine", nav_mines: "Mines", nav_animals: "Animaux",
+        nav_monsters: "Monstres", nav_festivals: "Festivals",
+        search_placeholder: "Rechercher (ex: Abigail, Panais, Saumon...)",
         search_results: "Résultats de recherche pour",
         no_results: "Aucun résultat trouvé.",
         featured: "⭐ En vedette (Change toutes les 10s)",
         home_title: "Bienvenue sur le Wiki Stardew Valley",
-        home_desc: "L'encyclopédie interactive complète. Choisissez une catégorie à gauche ou utilisez la barre de recherche !",
-        filter_all: "Tous", filter_spring: "Printemps", filter_summer: "Été", filter_fall: "Automne", filter_winter: "Hiver",
-        filter_marriage_yes: "Mariable", filter_marriage_no: "Non Mariable"
+        home_desc: "L'encyclopédie interactive complète. Choisissez une catégorie ci-dessous ou dans la barre latérale !",
+        filter_all: "Tous", filter_spring: "Printemps", filter_summer: "Été", filter_fall: "Automne", filter_winter: "Hiver"
     },
     en: {
         nav_home: "Home", nav_npcs: "Characters", nav_farming: "Farming",
-        nav_fish: "Fish", nav_items: "Items", nav_crafts: "Crafting",
-        search_placeholder: "Search (e.g., Abigail, Parsnip...)",
+        nav_fish: "Fish", nav_items: "Items", nav_crafts: "Crafting & Recipes",
+        nav_cooking: "Cooking", nav_mines: "Mines", nav_animals: "Animals",
+        nav_monsters: "Monsters", nav_festivals: "Festivals",
+        search_placeholder: "Search (e.g., Abigail, Parsnip, Salmon...)",
         search_results: "Search results for",
         no_results: "No results found.",
         featured: "⭐ Featured (Changes every 10s)",
         home_title: "Welcome to the Stardew Valley Wiki",
-        home_desc: "The complete interactive encyclopedia. Choose a category on the left or use the search bar!",
-        filter_all: "All", filter_spring: "Spring", filter_summer: "Summer", filter_fall: "Fall", filter_winter: "Winter",
-        filter_marriage_yes: "Marriageable", filter_marriage_no: "Not Marriageable"
+        home_desc: "The complete interactive encyclopedia. Choose a category below or use the sidebar!",
+        filter_all: "All", filter_spring: "Spring", filter_summer: "Summer", filter_fall: "Fall", filter_winter: "Winter"
     }
 };
 
-// Base de données complète
 const db = {
     NPCs: [
         {
             id: "abigail",
             img: "https://stardewvalleywiki.com/mediawiki/images/8/88/Abigail.png",
             name: { fr: "Abigail", en: "Abigail" },
-            marriage: true,
             birthday: { fr: "Automne 13", en: "Fall 13" },
             location: { fr: "Magasin de Pierre", en: "Pierre's General Store" },
             gifts: {
@@ -46,7 +45,6 @@ const db = {
             id: "sebastian",
             img: "https://stardewvalleywiki.com/mediawiki/images/a/a8/Sebastian.png",
             name: { fr: "Sebastian", en: "Sebastian" },
-            marriage: true,
             birthday: { fr: "Hiver 10", en: "Winter 10" },
             location: { fr: "Montagne (Sous-sol de Robin)", en: "Mountain (Robin's Basement)" },
             gifts: {
@@ -59,12 +57,11 @@ const db = {
             id: "linus",
             img: "https://stardewvalleywiki.com/mediawiki/images/3/31/Linus.png",
             name: { fr: "Linus", en: "Linus" },
-            marriage: false,
             birthday: { fr: "Hiver 3", en: "Winter 3" },
             location: { fr: "Tente dans la Montagne", en: "Tent in the Mountain" },
             gifts: {
                 loves: { fr: "Igname rôtie, Tarte aux myrtilles", en: "Yam, Blueberry Tart" },
-                likes: { fr: "Tous les fruits de cueillette", en: "All Foraged Minerals/Fruits" },
+                likes: { fr: "Tous les fruits de cueillette", en: "All Foraged Fruits" },
                 hates: { fr: "Toutes les gemmes", en: "All Gems" }
             }
         }
@@ -94,26 +91,26 @@ const db = {
             name: { fr: "Citrouille", en: "Pumpkin" },
             season: "fall",
             seedPrice: "100g",
-            growth: { fr: "13 Jours (Peut devenir géante)", en: "13 Days (Can be Giant)" },
+            growth: { fr: "13 Jours", en: "13 Days" },
             prices: { normal: 320, silver: 400, gold: 480, iridium: 640 }
         }
     ],
     Fish: [
         {
+            id: "salmon",
+            img: "https://stardewvalleywiki.com/mediawiki/images/a/a6/Salmon.png",
+            name: { fr: "Saumon", en: "Salmon" },
+            season: "fall",
+            location: { fr: "Rivière", en: "River" },
+            prices: { normal: 75, silver: 93, gold: 112, iridium: 150 }
+        },
+        {
             id: "catfish",
             img: "https://stardewvalleywiki.com/mediawiki/images/9/99/Catfish.png",
             name: { fr: "Poisson-chat", en: "Catfish" },
-            season: "spring_fall",
+            season: "spring",
             location: { fr: "Rivière (Temps de pluie)", en: "River (Raining)" },
             prices: { normal: 200, silver: 250, gold: 300, iridium: 400 }
-        },
-        {
-            id: "lavaeel",
-            img: "https://stardewvalleywiki.com/mediawiki/images/1/12/Lava_Eel.png",
-            name: { fr: "Anguille de lave", en: "Lava Eel" },
-            season: "all",
-            location: { fr: "Mines (Niveau 100) / Volcan", en: "Mines (Level 100) / Volcano" },
-            prices: { normal: 700, silver: 875, gold: 1050, iridium: 1400 }
         }
     ],
     Items: [
@@ -127,11 +124,23 @@ const db = {
     ],
     Crafting: [
         {
+            id: "furnace",
+            img: "https://stardewvalleywiki.com/mediawiki/images/e/e0/Furnace.png",
+            name: { fr: "Four", en: "Furnace" },
+            materials: { fr: "20 Pierres, 25 Cuivres", en: "20 Stone, 25 Copper Ore" },
+            unlock: { fr: "Quête de Clint (Au début)", en: "Clint's Quest (Early game)" }
+        },
+        {
             id: "iridiumsprinkler",
             img: "https://stardewvalleywiki.com/mediawiki/images/9/90/Iridium_Sprinkler.png",
             name: { fr: "Arroseur en iridium", en: "Iridium Sprinkler" },
             materials: { fr: "1 Lingot d'or, 1 Lingot d'iridium, 1 Pile", en: "1 Gold Bar, 1 Iridium Bar, 1 Battery Pack" },
             unlock: { fr: "Agriculture Niveau 9", en: "Farming Level 9" }
         }
-    ]
+    ],
+    Cooking: [],
+    Mines: [],
+    Animals: [],
+    Monsters: [],
+    Festivals: []
 };

@@ -1,62 +1,55 @@
-// === ETAT DE L'APPLICATION ===
 let currentLang = 'fr';
 let currentView = 'home';
 let currentCategory = null;
 let featuredInterval = null;
 
-// === ELEMENTS DOM ===
 const contentArea = document.getElementById('content-area');
 const searchInput = document.getElementById('global-search');
 const langBtn = document.getElementById('lang-toggle');
 const sidebar = document.getElementById('sidebar');
-const toggleSidebarBtn = document.getElementById('toggle-sidebar');
-const modalOverlay = document.getElementById('modal-overlay');
 
-// === ÉCOUTEURS D'ÉVÉNEMENTS ===
+document.getElementById('toggle-sidebar').addEventListener('click', () => sidebar.classList.toggle('collapsed'));
 langBtn.addEventListener('click', toggleLanguage);
-toggleSidebarBtn.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
 searchInput.addEventListener('input', (e) => handleSearch(e.target.value));
 document.getElementById('modal-close').addEventListener('click', closeModal);
 
-// === FONCTIONS DE BASE ===
 function toggleLanguage() {
     currentLang = currentLang === 'fr' ? 'en' : 'fr';
     langBtn.textContent = currentLang === 'fr' ? '🇫🇷 FR' : '🇬🇧 EN';
     updateUIStrings();
     
-    // Rafraichir la vue actuelle avec la nouvelle langue
     if (searchInput.value.trim() !== '') handleSearch(searchInput.value);
     else if (currentView === 'home') loadView('home');
     else if (currentView === 'category') loadView('category', currentCategory);
 }
 
 function updateUIStrings() {
-    // Met à jour tous les textes du menu et des placeholders
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        el.textContent = i18n[currentLang][key];
+        if(i18n[currentLang][key]) el.textContent = i18n[currentLang][key];
     });
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
         const key = el.getAttribute('data-i18n-placeholder');
-        el.placeholder = i18n[currentLang][key];
+        if(i18n[currentLang][key]) el.placeholder = i18n[currentLang][key];
     });
 }
 
 function loadView(viewType, categoryName = null) {
     currentView = viewType;
     currentCategory = categoryName;
-    clearInterval(featuredInterval); // Arrête le PNJ vedette
+    clearInterval(featuredInterval);
+    searchInput.value = ''; // Reset recherche au changement de page
     
-    // Gérer l'état actif du menu
     document.querySelectorAll('.sidebar li').forEach(li => li.classList.remove('active'));
     if(viewType === 'home') document.getElementById('nav-home').classList.add('active');
-    if(viewType === 'category') document.getElementById(`nav-${categoryName}`).classList.add('active');
+    if(viewType === 'category' && document.getElementById(`nav-${categoryName}`)) {
+        document.getElementById(`nav-${categoryName}`).classList.add('active');
+    }
 
     if (viewType === 'home') renderHome();
     else if (viewType === 'category') renderCategory(categoryName);
 }
 
-// === RENDU DES PAGES ===
 function renderHome() {
     contentArea.innerHTML = `
         <div class="home-hero">
@@ -67,7 +60,7 @@ function renderHome() {
             ${Object.keys(db).map(cat => `
                 <div class="card" onclick="loadView('category', '${cat}')">
                     <h3>${i18n[currentLang][`nav_${cat.toLowerCase()}`] || cat}</h3>
-                    <p>${db[cat].length} entries</p>
+                    <p>${db[cat].length} elements</p>
                 </div>
             `).join('')}
         </div>
@@ -75,10 +68,10 @@ function renderHome() {
 }
 
 function renderCategory(category, filterValue = 'all') {
-    let items = db[category];
-    let html = `<h1>${i18n[currentLang][`nav_${category.toLowerCase()}`] || category}</h1>`;
+    let items = db[category] || [];
+    let catName = i18n[currentLang][`nav_${category.toLowerCase()}`] || category;
+    let html = `<h1>${catName}</h1>`;
 
-    // Section Vedette UNIQUE pour les PNJ
     if (category === 'NPCs') {
         html += `<div id="featured-container" class="featured-card">
                     <div class="featured-label">${i18n[currentLang].featured}</div>
@@ -86,36 +79,33 @@ function renderCategory(category, filterValue = 'all') {
                  </div>`;
     }
 
-    // Filtres
-    html += `<div class="filters-bar">
-                <select id="main-filter" onchange="renderCategory('${category}', this.value)">
-                    <option value="all">${i18n[currentLang].filter_all}</option>
-                    ${category === 'Farming' ? `
+    if (category === 'Farming') {
+        html += `<div class="filters-bar" style="margin-bottom:20px;">
+                    <select onchange="renderCategory('${category}', this.value)">
+                        <option value="all">${i18n[currentLang].filter_all}</option>
                         <option value="spring" ${filterValue==='spring'?'selected':''}>${i18n[currentLang].filter_spring}</option>
                         <option value="summer" ${filterValue==='summer'?'selected':''}>${i18n[currentLang].filter_summer}</option>
                         <option value="fall" ${filterValue==='fall'?'selected':''}>${i18n[currentLang].filter_fall}</option>
-                    ` : ''}
-                </select>
-             </div>`;
-
-    // Application du filtre
-    if (filterValue !== 'all' && category === 'Farming') {
-        items = items.filter(item => item.season === filterValue);
+                    </select>
+                 </div>`;
+        if (filterValue !== 'all') items = items.filter(i => i.season === filterValue);
     }
 
-    // Grille des éléments
-    html += `<div class="grid-container">
-                ${items.map(item => `
-                    <div class="card" onclick="openModal('${item.id}', '${category}')">
-                        <img src="${item.img}" alt="${item.name[currentLang]}">
-                        <h3>${item.name[currentLang]}</h3>
-                    </div>
-                `).join('')}
-             </div>`;
+    if (items.length === 0) {
+        html += `<p>Aucun élément pour le moment dans cette catégorie. (Bientôt rempli !)</p>`;
+    } else {
+        html += `<div class="grid-container">
+                    ${items.map(item => `
+                        <div class="card" onclick="openModal('${item.id}', '${category}')">
+                            <img src="${item.img}" alt="${item.name[currentLang]}">
+                            <h3>${item.name[currentLang]}</h3>
+                        </div>
+                    `).join('')}
+                 </div>`;
+    }
 
     contentArea.innerHTML = html;
 
-    // Lancement du PNJ Vedette
     if (category === 'NPCs' && items.length > 0) {
         updateFeatured(items);
         featuredInterval = setInterval(() => updateFeatured(items), 10000);
@@ -129,7 +119,7 @@ function updateFeatured(items) {
         container.innerHTML = `
             <img src="${item.img}" alt="${item.name[currentLang]}">
             <div>
-                <h3 style="margin:0; font-size:24px; color:#d84315;">${item.name[currentLang]}</h3>
+                <h3 style="margin:0; font-size:22px; color:#d84315;">${item.name[currentLang]}</h3>
                 <p style="margin:5px 0;">📍 ${item.location[currentLang]}</p>
             </div>
         `;
@@ -137,21 +127,19 @@ function updateFeatured(items) {
     }
 }
 
-// === RECHERCHE GLOBALE ===
 function handleSearch(query) {
-    clearInterval(featuredInterval); // Arrête le featured en recherche
+    clearInterval(featuredInterval);
     if (query.trim() === '') {
-        loadView(currentView, currentCategory); // Retour à la vue normale
+        if(currentView === 'home') renderHome();
+        else renderCategory(currentCategory);
         return;
     }
 
     query = query.toLowerCase();
     let results = [];
 
-    // Parcourir toute la base de données
     for (let cat in db) {
         db[cat].forEach(item => {
-            // Cherche dans le nom en FR et en EN
             if (item.name.fr.toLowerCase().includes(query) || item.name.en.toLowerCase().includes(query)) {
                 results.push({ item, cat });
             }
@@ -175,16 +163,14 @@ function handleSearch(query) {
     contentArea.innerHTML = html;
 }
 
-// === FENÊTRES DÉTAILLÉES (MODALS) ===
 function openModal(itemId, category) {
     const item = db[category].find(i => i.id === itemId);
-    
+    if(!item) return;
+
     document.getElementById('modal-title').textContent = item.name[currentLang];
     document.getElementById('modal-img').src = item.img;
     
     let bodyHtml = '';
-
-    // Construction HTML différente selon la catégorie pour avoir des fiches parfaites
     if (category === 'NPCs') {
         bodyHtml = `
             <p><strong>🎂 Anniversaire :</strong> ${item.birthday[currentLang]}</p>
@@ -198,17 +184,16 @@ function openModal(itemId, category) {
         bodyHtml = `
             ${item.growth ? `<p><strong>Temps de pousse :</strong> ${item.growth[currentLang]}</p>` : ''}
             ${item.location ? `<p><strong>Lieu :</strong> ${item.location[currentLang]}</p>` : ''}
-            
             <h3>Prix de vente</h3>
             <table class="wiki-table">
                 <tr><th>Qualité</th><th>Prix</th></tr>
-                <tr><td class="quality-normal">Normal</td><td>${item.prices.normal}g</td></tr>
-                <tr><td class="quality-silver">Argent ★</td><td>${item.prices.silver}g</td></tr>
-                <tr><td class="quality-gold">Or ★</td><td>${item.prices.gold}g</td></tr>
-                <tr><td class="quality-iridium">Iridium ★</td><td>${item.prices.iridium}g</td></tr>
+                <tr><td>Normal</td><td>${item.prices.normal}g</td></tr>
+                <tr><td>Argent ★</td><td>${item.prices.silver}g</td></tr>
+                <tr><td>Or ★</td><td>${item.prices.gold}g</td></tr>
+                <tr><td>Iridium ★</td><td>${item.prices.iridium}g</td></tr>
             </table>
         `;
-    } else if (category === 'Items' || category === 'Crafting') {
+    } else {
         bodyHtml = `
             ${item.desc ? `<p><strong>Description :</strong> ${item.desc[currentLang]}</p>` : ''}
             ${item.materials ? `<p><strong>Matériaux :</strong> ${item.materials[currentLang]}</p>` : ''}
@@ -218,13 +203,12 @@ function openModal(itemId, category) {
     }
 
     document.getElementById('modal-body').innerHTML = bodyHtml;
-    modalOverlay.classList.remove('hidden');
+    document.getElementById('modal-overlay').classList.remove('hidden');
 }
 
 function closeModal() {
-    modalOverlay.classList.add('hidden');
+    document.getElementById('modal-overlay').classList.add('hidden');
 }
 
-// Initialisation au chargement de la page
 updateUIStrings();
 loadView('home');
